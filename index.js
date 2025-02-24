@@ -1,12 +1,16 @@
-/* Title: Uptime Monitoring Application
- * Description: A RESTful API to monitor up or down time of user defined links
- * Author: Siam Al Islam
- * Date: 2025-02-24
+/* 
+  *
+  *Title: Uptime Monitoring Application
+  * Description: A RESTful API to monitor up or down time of user defined links
+  * Author: Siam Al Islam
+  * Date: 2025-02-24
+  * 
  */
 
 // Dependencies
 const http = require('http');
 const url = require('url');
+const { StringDecoder } = require('string_decoder');
 
 // app object - module scaffolding
 const app = {};
@@ -35,11 +39,20 @@ app.handleReqRes = (req, res) => {
     const queryStringObject = parserUrl.query;
     const headersObject = req.headers;
 
-    console.log(queryStringObject);
-    console.log(headersObject);
-    console.log(trimmedPath);
-    // Response handle
-    res.end('Hello world!');
+    const decoder = new StringDecoder('utf-8');
+    let realData = '';
+
+    req.on('data', (buffer) => {
+        realData += decoder.write(buffer);
+    });
+
+    req.on('end', () => {
+        realData += decoder.end();
+        console.log(realData);
+
+        // Response handle
+        res.end('Hello world!');
+    })
 };
 
 // Start the server
