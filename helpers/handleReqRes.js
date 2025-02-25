@@ -10,6 +10,8 @@
 // Dependencies
 const { StringDecoder } = require('string_decoder');
 const url = require('url');
+const routes = require('../routes');
+const { notFoundHandler } = require('../handlers/routeHandlers/notFoundHandler');
 
 //Module scaffolding
 const handler = {};
@@ -24,8 +26,19 @@ handler.handleReqRes = (req, res) => {
     const queryStringObject = parserUrl.query;
     const headersObject = req.headers;
 
+    const requestProperties = {
+        parserUrl,
+        path,
+        trimmedPath,
+        method,
+        queryStringObject,
+        headersObject,
+    };
+
     const decoder = new StringDecoder('utf-8');
     let realData = '';
+
+    const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
 
     req.on('data', (buffer) => {
         realData += decoder.write(buffer);
